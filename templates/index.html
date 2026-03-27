@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Agent System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .input-section {
+            padding: 30px;
+            background: linear-gradient(to bottom, #f8f9fa, #ffffff);
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #f1f3f5;
+            color: #495057;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .status-section {
+            padding: 30px;
+            border-top: 2px solid #f1f3f5;
+            display: none;
+        }
+
+        .status-section.active {
+            display: block;
+        }
+
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .status-running {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+        }
+
+        .logs-container {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .log-entry {
+            padding: 5px 0;
+            color: #495057;
+        }
+
+        .log-entry::before {
+            content: "▸ ";
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .tasks-list {
+            background: #fff;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .task-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f3f5;
+        }
+
+        .task-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-item::before {
+            content: "✓ ";
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .files-section {
+            margin-top: 20px;
+        }
+
+        .file-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .file-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+            font-family: monospace;
+            font-size: 13px;
+        }
+
+        .download-btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .download-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .result-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .result-section pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .examples {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fff3cd;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .examples-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #856404;
+        }
+
+        .example-item {
+            padding: 8px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .example-item:hover {
+            background: #f8f9fa;
+            transform: translateX(5px);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            .input-section, .status-section {
+                padding: 20px;
+            }
+
+            .file-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 Multi-Agent System</h1>
+            <p class="subtitle">AI-powered code generation with autonomous agents</p>
+        </header>
+
+        <div class="main-card">
+            <div class="input-section">
+                <label for="goalInput">What would you like to build?</label>
+                <textarea 
+                    id="goalInput" 
+                    placeholder="Describe your project in detail...
+
+Example: Create a simple browser graphing calculator with:
+- HTML interface
+- Input box for equation f(x)
+- Graph drawn on canvas
+- Use vanilla JavaScript
+- Support Math.sin, Math.cos, x*x etc
+- No frameworks
+- Single page app"
+                ></textarea>
+
+                <div class="examples">
+                    <div class="examples-title">💡 Example Projects (click to use):</div>
+                    <div class="example-item" onclick="useExample(0)">
+                        📊 To-do list app with local storage
+                    </div>
+                    <div class="example-item" onclick="useExample(1)">
+                        🎨 Interactive color picker tool
+                    </div>
+                    <div class="example-item" onclick="useExample(2)">
+                        ⏱️ Pomodoro timer with notifications
+                    </div>
+                    <div class="example-item" onclick="useExample(3)">
+                        🎮 Simple snake game
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button id="generateBtn" class="btn-primary" onclick="startGeneration()">
+                        Generate Project
+                    </button>
+                    <button class="btn-secondary" onclick="clearAll()">
+                        Clear
+                    </button>
+                </div>
+            </div>
+
+            <div id="statusSection" class="status-section">
+                <div class="status-header">
+                    <h2>Generation Progress</h2>
+                    <span id="statusBadge" class="status-badge status-running">Running</span>
+                </div>
+
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+                </div>
+
+                <div id="tasksContainer" style="display: none;">
+                    <h3>Tasks Identified:</h3>
+                    <div id="tasksList" class="tasks-list"></div>
+                </div>
+
+                <h3>Activity Log:</h3>
+                <div id="logsContainer" class="logs-container"></div>
+
+                <div id="filesContainer" class="files-section" style="display: none;">
+                    <h3>Generated Files:</h3>
+                    <div id="filesList" class="file-list"></div>
+                    <a id="downloadBtn" class="download-btn" style="display: none;">
+                        📥 Download All Files (ZIP)
+                    </a>
+                </div>
+
+                <div id="resultContainer" class="result-section" style="display: none;">
+                    <h3>Final Result:</h3>
+                    <pre id="resultText"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const examples = [
+            `Create a to-do list web app with:
+- Add, edit, delete tasks
+- Mark tasks as complete
+- Filter by status (all, active, completed)
+- Save to localStorage
+- Clean, modern UI
+- Vanilla JavaScript
+- Single HTML file`,
+
+            `Create an interactive color picker tool:
+- Color selection with RGB sliders
+- Live preview
+- Display hex and RGB values
+- Copy to clipboard button
+- Color history (last 10 colors)
+- Responsive design
+- Vanilla JavaScript`,
+
+            `Create a Pomodoro timer app:
+- 25-minute work sessions
+- 5-minute breaks
+- Start, pause, reset controls
+- Browser notifications
+- Session counter
+- Sound alert
+- Clean minimal UI
+- Vanilla JavaScript`,
+
+            `Create a classic snake game:
+- Canvas-based graphics
+- Arrow key controls
+- Score tracking
+- Game over detection
+- Restart button
+- Speed increases with score
+- Food collection
+- Vanilla JavaScript`
+        ];
+
+        let currentJobId = null;
+        let pollInterval = null;
+
+        function useExample(index) {
+            document.getElementById('goalInput').value = examples[index];
+        }
+
+        async function startGeneration() {
+            const goal = document.getElementById('goalInput').value.trim();
+            
+            if (!goal) {
+                alert('Please enter a goal');
+                return;
+            }
+
+            // Disable button
+            const btn = document.getElementById('generateBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Generating...';
+
+            // Show status section
+            document.getElementById('statusSection').classList.add('active');
+            
+            // Reset UI
+            document.getElementById('logsContainer').innerHTML = '';
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('tasksContainer').style.display = 'none';
+            document.getElementById('filesContainer').style.display = 'none';
+            document.getElementById('resultContainer').style.display = 'none';
+
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ goal })
+                });
+
+                const data = await response.json();
+                currentJobId = data.job_id;
+
+                // Start polling for status
+                pollStatus();
+
+            } catch (error) {
+                alert('Error: ' + error.message);
+                btn.disabled = false;
+                btn.innerHTML = 'Generate Project';
+            }
+        }
+
+        function pollStatus() {
+            if (pollInterval) clearInterval(pollInterval);
+
+            pollInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`/api/status/${currentJobId}`);
+                    const data = await response.json();
+
+                    updateUI(data);
+
+                    if (data.status === 'completed' || data.status === 'error') {
+                        clearInterval(pollInterval);
+                        document.getElementById('generateBtn').disabled = false;
+                        document.getElementById('generateBtn').innerHTML = 'Generate Project';
+                    }
+
+                } catch (error) {
+                    console.error('Polling error:', error);
+                }
+            }, 1000);
+        }
+
+        function updateUI(data) {
+            // Update status badge
+            const statusBadge = document.getElementById('statusBadge');
+            statusBadge.className = `status-badge status-${data.status}`;
+            statusBadge.textContent = data.status.toUpperCase();
+
+            // Update progress bar
+            const progress = (data.current_iteration / 5) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+
+            // Update logs
+            const logsContainer = document.getElementById('logsContainer');
+            logsContainer.innerHTML = data.logs.map(log => 
+                `<div class="log-entry">${log}</div>`
+            ).join('');
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+
+            // Update tasks
+            if (data.tasks && data.tasks.length > 0) {
+                document.getElementById('tasksContainer').style.display = 'block';
+                document.getElementById('tasksList').innerHTML = data.tasks.map(task => 
+                    `<div class="task-item">${task}</div>`
+                ).join('');
+            }
+
+            // Update files
+            if (data.files && data.files.length > 0) {
+                document.getElementById('filesContainer').style.display = 'block';
+                document.getElementById('filesList').innerHTML = data.files.map(file => 
+                    `<div class="file-item">${file}</div>`
+                ).join('');
+
+                const downloadBtn = document.getElementById('downloadBtn');
+                downloadBtn.style.display = 'inline-block';
+                downloadBtn.href = `/api/download/${currentJobId}`;
+            }
+
+            // Update result
+            if (data.status === 'completed' && data.result) {
+                document.getElementById('resultContainer').style.display = 'block';
+                document.getElementById('resultText').textContent = data.result;
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('goalInput').value = '';
+            document.getElementById('statusSection').classList.remove('active');
+            
+            if (pollInterval) {
+                clearInterval(pollInterval);
+            }
+        }
+    </script>
+</body>
+</html>
